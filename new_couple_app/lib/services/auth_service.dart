@@ -58,6 +58,13 @@ class AuthService extends ChangeNotifier {
     }
   }
 
+  bool get isPartnerConnected {
+    print('현재 사용자: ${_currentUser?.id}');
+    print('파트너 ID: ${_currentUser?.partnerId}');
+    print('커플 ID: ${_currentUser?.coupleId}');
+    return _currentUser?.partnerId != null && _currentUser?.coupleId != null;
+  }
+
   Future<bool> login(String email, String password) async {
     _isLoading = true;
     _error = null;
@@ -205,51 +212,70 @@ class AuthService extends ChangeNotifier {
     }
   }
 
+  // AuthService 클래스에 추가
   Future<bool> connectWithPartner(String partnerCode) async {
+    if (_currentUser == null) {
+      _error = 'User not logged in';
+      notifyListeners();
+      return false;
+    }
+    
     _isLoading = true;
     _error = null;
     notifyListeners();
-
+    
     try {
-      // Find partner with the given code
+      // 파트너 사용자 찾기
       QuerySnapshot query = await _firestore.collection('users')
           .where('id', isEqualTo: partnerCode)
           .limit(1)
           .get();
 
       if (query.docs.isEmpty) {
-        _error = 'Partner not found with the given code';
+        _error = '파트너를 찾을 수 없습니다.';
         return false;
       }
 
-      app.User partner = app.User.fromJson(query.docs.first.data() as Map<String, dynamic>);
+      // 파트너 정보
+      final partnerData = query.docs.first.data() as Map<String, dynamic>;
+      final partnerId = partnerData['id'] as String;
       
-      // Create a couple ID
-      String coupleId = '${_currentUser!.id}_${partner.id}';
+      // 이미 다른 파트너와 연결되어 있는지 확인
+      if (partnerData['partnerId'] != null && partnerData['partnerId'] != _currentUser!.id) {
+        _error = '파트너가 이미 다른 사용자와 연결되어 있습니다.';
+        return false;
+      }
       
-      // Update both users with partner info
+      // 커플 ID 생성
+      String coupleId = '${_currentUser!.id}_$partnerId';
+      
+      // 양쪽 사용자 모두 업데이트
       await _firestore.collection('users').doc(_currentUser!.id).update({
-        'partnerId': partner.id,
+        'partnerId': partnerId,
         'coupleId': coupleId,
       });
       
-      await _firestore.collection('users').doc(partner.id).update({
+      await _firestore.collection('users').doc(partnerId).update({
         'partnerId': _currentUser!.id,
         'coupleId': coupleId,
       });
       
-      // Create a default room for the couple
-      await _firestore.collection('rooms').doc(coupleId).set({
+      // 커플 화폐 초기화
+      await _firestore.collection('couple_currencies').doc(coupleId).set({
         'coupleId': coupleId,
-        'wallpaperId': 'default_wallpaper',
-        'flooringId': 'default_flooring',
-        'roomLevel': 1,
-        'placedItems': [],
+        'amount': 100, // 초기 보너스 지급
+        'lastUpdated': DateTime.now().millisecondsSinceEpoch,
+        'history': [{
+          'amount': 100,
+          'reason': '커플 연결 보너스',
+          'timestamp': DateTime.now().millisecondsSinceEpoch,
+          'userId': _currentUser!.id
+        }]
       });
       
-      // Update current user
+      // 현재 사용자 정보 업데이트
       _currentUser = _currentUser!.copyWith(
-        partnerId: partner.id,
+        partnerId: partnerId,
         coupleId: coupleId,
       );
       

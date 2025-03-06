@@ -67,7 +67,13 @@ class _LoginScreenState extends State<LoginScreen> {
     if (success && mounted) {
       print("현재 사용자: ${authService.currentUser?.email}");
       // 다음 화면으로 이동
-      Navigator.pushReplacementNamed(context, '/couple-connect');
+      if (authService.isPartnerConnected) {
+        // 파트너와 이미 연결된 경우 메인 화면으로 이동
+        Navigator.pushReplacementNamed(context, '/main');
+      } else {
+        // 파트너와 연결되지 않은 경우 파트너 연결 화면으로 이동
+        Navigator.pushReplacementNamed(context, '/couple-connect');
+      }
     } else if (!success && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Login failed: ${authService.error}')),

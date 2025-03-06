@@ -108,6 +108,7 @@ class _RoomScreenState extends State<RoomScreen> {
       body: Column(
         children: [
           // Currency display
+          // Currency display
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
             color: Colors.white,
@@ -118,15 +119,23 @@ class _RoomScreenState extends State<RoomScreen> {
                   'Room Level: ${roomDecoration.roomLevel}',
                   style: AppTheme.captionStyle,
                 ),
-                Row(
-                  children: [
-                    const Icon(Icons.monetization_on, color: AppTheme.accentColor, size: 20),
-                    const SizedBox(width: 4),
-                    Text(
-                      '${authService.currentUser?.currency ?? 0} Coins',
-                      style: AppTheme.captionStyle,
-                    ),
-                  ],
+                // 여기서 FutureBuilder를 사용하여 실시간 코인 정보 가져오기
+                FutureBuilder<int>(
+                  // 여기서는 예시로 getCoupleCurrency 메서드를 사용하나, 실제로는 이 메서드를 구현해야 함
+                  future: authService.getCoupleCurrency(),
+                  builder: (context, snapshot) {
+                    final currencyCount = snapshot.data ?? authService.currentUser?.currency ?? 0;
+                    return Row(
+                      children: [
+                        const Icon(Icons.monetization_on, color: AppTheme.accentColor, size: 20),
+                        const SizedBox(width: 4),
+                        Text(
+                          '$currencyCount Coins',
+                          style: AppTheme.captionStyle,
+                        ),
+                      ],
+                    );
+                  },
                 ),
               ],
             ),

@@ -11,6 +11,7 @@ import 'package:new_couple_app/services/decoration_service.dart';
 import 'package:new_couple_app/screens/auth/login_screen.dart';
 import 'package:new_couple_app/screens/feed/feed_screen.dart';
 import 'package:new_couple_app/screens/main_screen.dart';
+import 'package:new_couple_app/screens/auth/couple_connect_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -61,13 +62,19 @@ class MyApp extends StatelessWidget {
         title: 'Couple SNS',
         theme: AppTheme.lightTheme,
         darkTheme: AppTheme.darkTheme,
-        themeMode: ThemeMode.system,
+        themeMode: ThemeMode.light,
         debugShowCheckedModeBanner: false,
         initialRoute: AppRoutes.login,
         routes: AppRoutes.routes,
         home: Consumer<AuthService>(
           builder: (context, authService, _) {
-            return authService.isLoggedIn ? const MainScreen() : const LoginScreen();
+            if (!authService.isLoggedIn) {
+              return const LoginScreen();
+            } else if (!authService.isPartnerConnected) {
+              return const CoupleConnectScreen();
+            } else {
+              return const MainScreen();
+            }
           },
         ),
       ),
