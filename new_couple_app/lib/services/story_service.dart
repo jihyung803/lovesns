@@ -168,7 +168,10 @@ class StoryService extends ChangeNotifier {
       await _firestore.collection('stories').doc(storyId).set(newStory.toJson());
       
       // Add currency reward for completing mission
-      await _authService.updateCurrency(_todayMission!.rewardAmount);
+      // StoryService의 createStory 메서드 수정
+      // Add currency reward for completing mission
+      await _authService.updateCurrency(_todayMission!.rewardAmount, 
+          reason: 'Completed mission: ${_todayMission!.title}');
       
       // Add to local list
       _stories.insert(0, newStory);
@@ -210,16 +213,21 @@ class StoryService extends ChangeNotifier {
   
   Future<List<Story>> getStoriesByUser(String userId) async {
     try {
+      print('프로필: 스토리 조회 시작 - 사용자 ID: $userId');
+      
       final QuerySnapshot snapshot = await _firestore
           .collection('stories')
           .where('userId', isEqualTo: userId)
           .orderBy('createdAt', descending: true)
           .get();
       
+      print('프로필: 조회된 스토리 수: ${snapshot.docs.length}');
+      
       return snapshot.docs
           .map((doc) => Story.fromJson(doc.data() as Map<String, dynamic>))
           .toList();
     } catch (e) {
+      print('프로필: 스토리 조회 오류: $e');
       _error = e.toString();
       return [];
     }

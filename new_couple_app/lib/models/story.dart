@@ -3,6 +3,7 @@ class Story {
   final String userId;
   final String coupleId;
   final String imageUrl;
+  final bool isLocalImage;  // 추가된 필드
   final String caption;
   final DateTime createdAt;
   final DateTime expiresAt;
@@ -15,6 +16,7 @@ class Story {
     required this.userId,
     required this.coupleId,
     required this.imageUrl,
+    this.isLocalImage = false,  // 기본값은 false
     required this.caption,
     required this.createdAt,
     required this.expiresAt,
@@ -29,6 +31,7 @@ class Story {
       userId: json['userId'] as String,
       coupleId: json['coupleId'] as String,
       imageUrl: json['imageUrl'] as String,
+      isLocalImage: json['isLocalImage'] as bool? ?? false,
       caption: json['caption'] as String,
       createdAt: DateTime.fromMillisecondsSinceEpoch(json['createdAt'] as int),
       expiresAt: DateTime.fromMillisecondsSinceEpoch(json['expiresAt'] as int),
@@ -44,6 +47,7 @@ class Story {
       'userId': userId,
       'coupleId': coupleId,
       'imageUrl': imageUrl,
+      'isLocalImage': isLocalImage,
       'caption': caption,
       'createdAt': createdAt.millisecondsSinceEpoch,
       'expiresAt': expiresAt.millisecondsSinceEpoch,
@@ -58,6 +62,7 @@ class Story {
     String? userId,
     String? coupleId,
     String? imageUrl,
+    bool? isLocalImage,
     String? caption,
     DateTime? createdAt,
     DateTime? expiresAt,
@@ -70,6 +75,7 @@ class Story {
       userId: userId ?? this.userId,
       coupleId: coupleId ?? this.coupleId,
       imageUrl: imageUrl ?? this.imageUrl,
+      isLocalImage: isLocalImage ?? this.isLocalImage,
       caption: caption ?? this.caption,
       createdAt: createdAt ?? this.createdAt,
       expiresAt: expiresAt ?? this.expiresAt,

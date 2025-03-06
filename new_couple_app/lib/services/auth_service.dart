@@ -155,16 +155,22 @@ class AuthService extends ChangeNotifier {
     
     try {
       // 임시 파트너 및 커플 ID 생성
-      final dummyPartnerId = 'dev_partner_${DateTime.now().millisecondsSinceEpoch}';
-      final dummyCoupleId = 'dev_couple_${DateTime.now().millisecondsSinceEpoch}';
+      // 일관된 커플 ID 사용
+      const String devCoupleId = 'dev_couple_123';
+      await _firestore.collection('users').doc(_currentUser!.id).update({
+        'partnerId': 'dev_partner_123',
+        'coupleId': devCoupleId,
+      });
       
-      // 로컬 사용자 객체 업데이트
       _currentUser = _currentUser!.copyWith(
-        partnerId: dummyPartnerId,
-        coupleId: dummyCoupleId,
+        partnerId: 'dev_partner_123',
+        coupleId: devCoupleId,
       );
       
+      print('개발용 파트너 설정 완료: 커플 ID = $devCoupleId');
+      
       // Firebase에 저장하지 않고 로컬만 업데이트
+      
       
       _isLoading = false;
       notifyListeners();
@@ -303,21 +309,79 @@ class AuthService extends ChangeNotifier {
     }
   }
 
-  Future<bool> updateCurrency(int amount) async {
-    if (_currentUser == null) return false;
+  Future<bool> updateCurrency(int amount, {String? reason}) async {
+    if (_currentUser == null || _currentUser!.coupleId == null) return false;
 
+    final coupleId = _currentUser!.coupleId!;
+    final docRef = _firestore.collection('couple_currencies').doc(coupleId);
+    
     try {
-      int newAmount = _currentUser!.currency + amount;
-      await _firestore.collection('users').doc(_currentUser!.id).update({
-        'currency': newAmount,
+      // 트랜잭션을 사용하여 동시 업데이트 문제 방지
+      return await _firestore.runTransaction<bool>((transaction) async {
+        final snapshot = await transaction.get(docRef);
+        
+        if (!snapshot.exists) {
+          // 문서가 없으면 새로 생성
+          transaction.set(docRef, {
+            'coupleId': coupleId,
+            'amount': amount,
+            'lastUpdated': DateTime.now().millisecondsSinceEpoch,
+            'history': [{
+              'amount': amount,
+              'reason': reason ?? 'Initial balance',
+              'timestamp': DateTime.now().millisecondsSinceEpoch,
+              'userId': _currentUser!.id
+            }]
+          });
+        } else {
+          // 기존 문서 업데이트
+          final currentAmount = snapshot.data()?['amount'] as int? ?? 0;
+          final newAmount = currentAmount + amount;
+          
+          if (newAmount < 0) {
+            // 잔액 부족
+            return false;
+          }
+          
+          // 히스토리 업데이트
+          final List<dynamic> history = snapshot.data()?['history'] as List<dynamic>? ?? [];
+          history.add({
+            'amount': amount,
+            'reason': reason ?? (amount > 0 ? 'Earned coins' : 'Spent coins'),
+            'timestamp': DateTime.now().millisecondsSinceEpoch,
+            'userId': _currentUser!.id
+          });
+          
+          transaction.update(docRef, {
+            'amount': newAmount,
+            'lastUpdated': DateTime.now().millisecondsSinceEpoch,
+            'history': history
+          });
+        }
+        
+        return true;
       });
-      
-      _currentUser = _currentUser!.copyWith(currency: newAmount);
-      notifyListeners();
-      return true;
     } catch (e) {
       _error = e.toString();
       return false;
+    }
+  }
+
+  Future<int> getCoupleCurrency() async {
+    if (_currentUser == null || _currentUser!.coupleId == null) return 0;
+    
+    try {
+      final coupleId = _currentUser!.coupleId!;
+      final docSnapshot = await _firestore.collection('couple_currencies').doc(coupleId).get();
+      
+      if (docSnapshot.exists) {
+        return docSnapshot.data()?['amount'] as int? ?? 0;
+      }
+      
+      return 0;
+    } catch (e) {
+      _error = e.toString();
+      return 0;
     }
   }
 
@@ -335,4 +399,27 @@ class AuthService extends ChangeNotifier {
       return null;
     }
   }
+
+  // AuthService 클래스에 다음 메서드 추가
+  Future<void> initializeCoupleCurrency() async {
+    if (_currentUser == null || _currentUser!.coupleId == null) return;
+    
+    final coupleId = _currentUser!.coupleId!;
+    
+    // 커플 화폐 문서가 이미 존재하는지 확인
+    final docRef = _firestore.collection('couple_currencies').doc(coupleId);
+    final doc = await docRef.get();
+    
+    if (!doc.exists) {
+      // 새 커플 화폐 문서 생성
+      await docRef.set({
+        'coupleId': coupleId,
+        'amount': 0,
+        'lastUpdated': DateTime.now().millisecondsSinceEpoch,
+        'history': []
+      });
+    }
+  }
+
+  
 }

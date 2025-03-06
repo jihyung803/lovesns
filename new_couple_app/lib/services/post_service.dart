@@ -6,10 +6,6 @@ import 'package:uuid/uuid.dart';
 import 'package:new_couple_app/models/post.dart';
 import 'package:new_couple_app/models/user.dart';
 import 'package:new_couple_app/services/auth_service.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:path/path.dart' as path;
-
 
 class PostService extends ChangeNotifier {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -70,8 +66,7 @@ class PostService extends ChangeNotifier {
       return null;
     }
   }
-
-
+  
   Future<bool> createPost(String content, List<File> images) async {
     if (_authService.currentUser == null || _authService.currentUser!.coupleId == null) {
       _error = 'User not connected with a partner';
@@ -85,55 +80,38 @@ class PostService extends ChangeNotifier {
     
     try {
       final String postId = const Uuid().v4();
-      final List<String> localImagePaths = [];
+      final List<String> imageUrls = [];
       
-      // 로컬에 이미지 저장
+      // Upload images if any
       if (images.isNotEmpty) {
-        print('Saving images locally...');
-        final appDir = await getApplicationDocumentsDirectory();
-        final postsDir = Directory('${appDir.path}/posts');
-        
-        // posts 디렉토리 생성 (없는 경우)
-        if (!await postsDir.exists()) {
-          await postsDir.create(recursive: true);
-        }
-        
         for (int i = 0; i < images.length; i++) {
-          final String fileName = '${postId}_${i}.jpg';
-          final String localPath = '${postsDir.path}/$fileName';
-          
-          print('Copying image to: $localPath');
-          final File newFile = await images[i].copy(localPath);
-          print('Image saved successfully: ${await newFile.exists()}');
-          
-          localImagePaths.add(localPath);
+          final path = 'posts/${_authService.currentUser!.id}/$postId/$i.jpg';
+          final ref = _storage.ref().child(path);
+          await ref.putFile(images[i]);
+          final url = await ref.getDownloadURL();
+          imageUrls.add(url);
         }
       }
       
-      // 게시물 생성
+      // Create post document
       final Post newPost = Post(
         id: postId,
         userId: _authService.currentUser!.id,
         coupleId: _authService.currentUser!.coupleId!,
         content: content,
-        imageUrls: localImagePaths,
-        isLocalImages: true,  // 로컬 이미지임을 표시
+        imageUrls: imageUrls,
         createdAt: DateTime.now(),
       );
       
-      // Firestore에 게시물 저장
       await _firestore.collection('posts').doc(postId).set(newPost.toJson());
-      print('Post created with ID: $postId');
       
-      // 포스팅 보상으로 통화 추가
-      await _authService.updateCurrency(5);
       
-      // 게시물 목록 새로고침
+      // Refresh posts list
       _posts.insert(0, newPost);
+      await _authService.updateCurrency(5, reason: 'Posted a new photo');
       
       return true;
     } catch (e) {
-      print('Error creating post: $e');
       _error = e.toString();
       return false;
     } finally {
@@ -215,7 +193,8 @@ class PostService extends ChangeNotifier {
         isLikedByPartner: newLikeStatus,
         likeCount: post.likeCount + (newLikeStatus ? 1 : -1),
       );
-      
+      await _authService.updateCurrency(2, reason: 'liked a post');
+
       notifyListeners();
       return true;
     } catch (e) {
@@ -323,16 +302,29 @@ class PostService extends ChangeNotifier {
   // Fetch posts by user for profile
   Future<List<Post>> getPostsByUser(String userId) async {
     try {
+      print('프로필: 사용자 게시글 검색 시작 - 사용자 ID: $userId');
+      
       final QuerySnapshot snapshot = await _firestore
           .collection('posts')
           .where('userId', isEqualTo: userId)
           .orderBy('createdAt', descending: true)
           .get();
       
-      return snapshot.docs
+      print('프로필: 쿼리 결과 - ${snapshot.docs.length}개 게시글 찾음');
+      
+      // 각 문서의 userId 필드 확인 (디버깅용)
+      for (var doc in snapshot.docs) {
+        final data = doc.data() as Map<String, dynamic>;
+        print('프로필: 게시글 ID=${doc.id}, userId=${data['userId']}, content=${data['content']}');
+      }
+      
+      final posts = snapshot.docs
           .map((doc) => Post.fromJson(doc.data() as Map<String, dynamic>))
           .toList();
+      
+      return posts;
     } catch (e) {
+      print('프로필: 사용자 게시글 로드 오류 - $e');
       _error = e.toString();
       return [];
     }

@@ -1,3 +1,5 @@
+import '../services/auth_service.dart'; // Add this import
+
 class User {
   final String id;
   final String email;
@@ -6,6 +8,7 @@ class User {
   final String? partnerId;
   final String? coupleId;
   final DateTime createdAt;
+  // currency 필드는 유지하되 coupleId가 동일한 사용자들이 공유하는 개념으로 변경
   final int currency;
   final DateTime? relationshipStartDate;
   final DateTime? partnerBirthday;
@@ -95,6 +98,15 @@ class User {
       menstrualCycleStart: menstrualCycleStart ?? this.menstrualCycleStart,
       menstrualCycleDuration: menstrualCycleDuration ?? this.menstrualCycleDuration,
     );
+  }
+
+  int _cachedCurrency = 0;
+
+  Future<int> get currentCurrency async {
+    final authService = AuthService(); // singleton 방식으로 구현된 경우
+    final currentCurrency = await authService.getCoupleCurrency();
+    _cachedCurrency = currentCurrency;
+    return currentCurrency;
   }
 }
 

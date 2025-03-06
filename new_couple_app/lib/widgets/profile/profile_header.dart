@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:new_couple_app/config/app_theme.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+import 'package:new_couple_app/services/auth_service.dart'; // Assuming this is the location of AuthService
 
 class ProfileHeader extends StatelessWidget {
   final String username;
@@ -20,6 +22,8 @@ class ProfileHeader extends StatelessWidget {
     this.partnerId,
   }) : super(key: key);
 
+  
+
   @override
   Widget build(BuildContext context) {
     // Calculate relationship duration if available
@@ -28,20 +32,20 @@ class ProfileHeader extends StatelessWidget {
       final now = DateTime.now();
       final difference = now.difference(relationshipStartDate!);
       final days = difference.inDays;
-      
-      if (days < 30) {
-        relationshipDuration = '$days days';
-      } else if (days < 365) {
-        final months = days ~/ 30;
-        relationshipDuration = '$months months';
-      } else {
-        final years = days ~/ 365;
-        final remainingMonths = (days % 365) ~/ 30;
-        relationshipDuration = '$years years';
-        if (remainingMonths > 0) {
-          relationshipDuration += ', $remainingMonths months';
-        }
-      }
+      relationshipDuration = '$days days';
+      // if (days < 30) {
+      //   relationshipDuration = '$days days';
+      // } else if (days < 365) {
+      //   final months = days ~/ 30;
+      //   relationshipDuration = '$months months';
+      // } else {
+      //   final years = days ~/ 365;
+      //   final remainingMonths = (days % 365) ~/ 30;
+      //   relationshipDuration = '$years years';
+      //   if (remainingMonths > 0) {
+      //     relationshipDuration += ', $remainingMonths months';
+      //   }
+      // }
     }
 
     return Container(
@@ -88,7 +92,13 @@ class ProfileHeader extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     _buildStat('Posts', postCount.toString()),
-                    _buildStat('Coins', currencyCount.toString()),
+                    FutureBuilder<int>(
+                      future: Provider.of<AuthService>(context, listen: false).getCoupleCurrency(),
+                      builder: (context, snapshot) {
+                        final currencyCount = snapshot.data ?? 0;
+                        return _buildStat('Coins', currencyCount.toString());
+                      },
+                    ),
                     _buildStat(
                       'Together',
                       relationshipDuration,

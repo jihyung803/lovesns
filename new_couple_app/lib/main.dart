@@ -17,11 +17,11 @@ void main() async {
     // Firebase 초기화
   await Firebase.initializeApp(
     options: FirebaseOptions(
-      apiKey: 'AIzaSyAwDYwDnv-YDC_sWz7fhlOPnAKbhenVsI8',
-      appId: '1:969309172686:ios:3a25572e57038c1f58319f',
-      messagingSenderId: '969309172686',
-      projectId: 'lovestar-778ec',
-      storageBucket: 'lovestar-778ec.firebasestorage.app',
+      apiKey: 'AIzaSyBjRHZFLtDOyK2Y_xdEYBXGxznef8w0h8w',
+      appId: '1:1082138474791:ios:1fe1ed8997b92498615102',
+      messagingSenderId: '1082138474791',
+      projectId: 'lovesns-116e5',
+      storageBucket: 'lovesns-116e5.firebasestorage.app',
     ),
   );
   

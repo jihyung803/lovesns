@@ -166,70 +166,60 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
       );
     }
     
-    return MasonryGridView.count(
-      crossAxisCount: 3,
-      mainAxisSpacing: 4,
-      crossAxisSpacing: 4,
+    return GridView.builder(
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 3,
+        childAspectRatio: 1, // 1:1 비율 강제
+        crossAxisSpacing: 2,
+        mainAxisSpacing: 2,
+      ),
       itemCount: _userPosts.length,
       itemBuilder: (context, index) {
         final post = _userPosts[index];
         
-        // If post has images, display the first one
-        if (post.imageUrls.isNotEmpty) {
-          return GestureDetector(
-            onTap: () {
-              Navigator.pushNamed(
-                context,
-                '/post-detail',
-                arguments: post.id,
-              );
-            },
-            child: ClipRRect(
+        return GestureDetector(
+          onTap: () {
+            Navigator.pushNamed(
+              context,
+              '/post-detail',
+              arguments: post.id,
+            );
+          },
+          child: Container(
+            decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(4),
-              child: Image.network(
-                post.imageUrls.first,
-                fit: BoxFit.cover,
-              ),
+              border: Border.all(color: Colors.grey.shade300, width: 0),
             ),
-          );
-        } else {
-          // If no images, display the text content
-          return GestureDetector(
-            onTap: () {
-              Navigator.pushNamed(
-                context,
-                '/post-detail',
-                arguments: post.id,
-              );
-            },
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.grey.shade200,
-                borderRadius: BorderRadius.circular(4),
-              ),
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    post.content,
-                    maxLines: 3,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(fontSize: 12),
+            child: post.imageUrls.isNotEmpty
+              ? Image.network(
+                  post.imageUrls.first,
+                  fit: BoxFit.cover,
+                )
+              : Container(
+                  color: Colors.grey.shade200,
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        post.content,
+                        maxLines: 3,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(fontSize: 12),
+                      ),
+                      const Spacer(),
+                      Text(
+                        DateFormat('MMM d').format(post.createdAt),
+                        style: TextStyle(
+                          fontSize: 10,
+                          color: Colors.grey.shade700,
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    DateFormat('MMM d, yyyy').format(post.createdAt),
-                    style: TextStyle(
-                      fontSize: 10,
-                      color: Colors.grey.shade700,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          );
-        }
+                ),
+          ),
+        );
       },
     );
   }

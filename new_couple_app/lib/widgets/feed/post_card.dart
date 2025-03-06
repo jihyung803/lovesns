@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:carousel_slider/carousel_slider.dart';
@@ -146,62 +145,27 @@ class _PostCardState extends State<PostCard> {
                   options: CarouselOptions(
                     aspectRatio: 1,
                     viewportFraction: 1.0,
-                    enableInfiniteScroll: widget.post.imageUrls.length > 1,
+                    enableInfiniteScroll: false,
                     onPageChanged: (index, reason) {
                       setState(() {
                         _currentImageIndex = index;
                       });
                     },
                   ),
-                  items: widget.post.imageUrls.map((imagePath) {
+                  items: widget.post.imageUrls.map((imageUrl) {
                     return Builder(
                       builder: (context) {
-                        // 로컬 이미지인지 Firebase 이미지인지 확인
-                        if (widget.post.isLocalImages) {
-                          print('Loading local image: $imagePath');
-                          // 로컬 이미지 표시
-                          return Image.file(
-                            File(imagePath),
-                            fit: BoxFit.cover,
-                            width: double.infinity,
-                            errorBuilder: (context, error, stackTrace) {
-                              print('Error loading local image: $error');
-                              return Center(
-                                child: Icon(Icons.error, color: Colors.red),
-                              );
-                            },
-                          );
-                        } else {
-                          // 네트워크 이미지 표시 (Firebase Storage URL)
-                          return Image.network(
-                            imagePath,
-                            fit: BoxFit.cover,
-                            width: double.infinity,
-                            loadingBuilder: (context, child, loadingProgress) {
-                              if (loadingProgress == null) return child;
-                              return Center(
-                                child: CircularProgressIndicator(
-                                  value: loadingProgress.expectedTotalBytes != null
-                                      ? loadingProgress.cumulativeBytesLoaded / 
-                                          loadingProgress.expectedTotalBytes!
-                                      : null,
-                                ),
-                              );
-                            },
-                            errorBuilder: (context, error, stackTrace) {
-                              print('Error loading network image: $error');
-                              return Center(
-                                child: Icon(Icons.error, color: Colors.red),
-                              );
-                            },
-                          );
-                        }
+                        return Image.network(
+                          imageUrl,
+                          fit: BoxFit.cover,
+                          width: double.infinity,
+                        );
                       },
                     );
                   }).toList(),
                 ),
                 
-                // 이미지 인디케이터 (여러 이미지인 경우)
+                // Image indicators
                 if (widget.post.imageUrls.length > 1)
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 8.0),
