@@ -1,0 +1,2 @@
+C:/new_couple/new_couple_app/android/app/.cxx/RelWithDebInfo/6p6rj5w3/arm64-v8a/CMakeFiles/edit_cache.dir
+C:/new_couple/new_couple_app/android/app/.cxx/RelWithDebInfo/6p6rj5w3/arm64-v8a/CMakeFiles/rebuild_cache.dir

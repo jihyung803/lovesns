@@ -1,0 +1,2 @@
+C:/new_couple/new_couple_app/android/app/.cxx/Debug/5a4k5s37/x86/CMakeFiles/edit_cache.dir
+C:/new_couple/new_couple_app/android/app/.cxx/Debug/5a4k5s37/x86/CMakeFiles/rebuild_cache.dir
