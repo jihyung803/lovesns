@@ -11,6 +11,17 @@ class AppTheme {
   static const Color successColor = Color(0xFF69F0AE);
   static const Color warningColor = Color(0xFFFFD54F);
   static const Color disabledColor = Color(0xFFBDBDBD);
+  
+  // Mystical Colors
+  static const Color cosmicPurple = Color(0xFF8A2BE2);
+  static const Color deepSpace = Color(0xFF191230);
+  static const Color starGlow = Color(0xFFFFF8E1);
+  static const Color cosmicPink = Color(0xFFFF69B4);
+  static const Color nebulaTeal = Color(0xFF40E0D0);
+  static const Color galaxyBlue = Color(0xFF0066FF);
+  static const Color celestialIndigo = Color(0xFF4B0082);
+  static const Color meteorOrange = Color(0xFFFF7F50);
+  static const Color voidBlack = Color(0xFF0F0A1F);
 
   // Text Styles
   static const TextStyle headingStyle = TextStyle(
@@ -39,6 +50,37 @@ class AppTheme {
     fontSize: 12,
     fontWeight: FontWeight.w300,
     color: textColor,
+  );
+  
+  // Mystical Text Styles
+  static const TextStyle cosmicHeadingStyle = TextStyle(
+    fontFamily: 'Montserrat',
+    fontSize: 24,
+    fontWeight: FontWeight.bold,
+    color: Colors.white,
+    letterSpacing: 0.5,
+    shadows: [
+      Shadow(
+        color: Color(0xFFFF69B4),
+        blurRadius: 10,
+        offset: Offset(0, 2),
+      ),
+    ],
+  );
+  
+  static const TextStyle cosmicSubheadingStyle = TextStyle(
+    fontFamily: 'Montserrat',
+    fontSize: 18,
+    fontWeight: FontWeight.w600,
+    color: Colors.white,
+    letterSpacing: 0.5,
+  );
+  
+  static const TextStyle cosmicBodyStyle = TextStyle(
+    fontFamily: 'Montserrat',
+    fontSize: 14,
+    fontWeight: FontWeight.normal,
+    color: Colors.white,
   );
 
   // Light Theme
@@ -123,86 +165,131 @@ class AppTheme {
     fontFamily: 'Montserrat',
   );
 
-  // Dark Theme
+  // Dark Theme with Cosmic Enhancement
   static final ThemeData darkTheme = ThemeData(
-    primaryColor: primaryColor,
-    colorScheme: const ColorScheme.dark(
-      primary: primaryColor,
-      secondary: secondaryColor,
+    primaryColor: cosmicPink,
+    colorScheme: ColorScheme.dark(
+      primary: cosmicPink,
+      secondary: nebulaTeal,
       error: errorColor,
-      background: Color(0xFF121212),
-      surface: Color(0xFF1E1E1E),
+      background: deepSpace,
+      surface: voidBlack,
     ),
-    scaffoldBackgroundColor: const Color(0xFF121212),
-    appBarTheme: const AppBarTheme(
-      backgroundColor: Color(0xFF1E1E1E),
+    scaffoldBackgroundColor: deepSpace,
+    appBarTheme: AppBarTheme(
+      backgroundColor: Colors.transparent,
       elevation: 0,
-      iconTheme: IconThemeData(color: Colors.white),
-      titleTextStyle: TextStyle(
-        fontFamily: 'Montserrat',
-        fontSize: 20,
-        fontWeight: FontWeight.bold,
-        color: Colors.white,
-      ),
+      iconTheme: const IconThemeData(color: Colors.white),
+      titleTextStyle: cosmicHeadingStyle.copyWith(fontSize: 20),
     ),
-    tabBarTheme: const TabBarTheme(
-      labelColor: primaryColor,
+    tabBarTheme: TabBarTheme(
+      labelColor: cosmicPink,
       unselectedLabelColor: Colors.grey,
       indicatorSize: TabBarIndicatorSize.tab,
     ),
-    bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-      backgroundColor: Color(0xFF1E1E1E),
-      selectedItemColor: primaryColor,
+    bottomNavigationBarTheme: BottomNavigationBarThemeData(
+      backgroundColor: voidBlack.withOpacity(0.7),
+      selectedItemColor: cosmicPink,
       unselectedItemColor: Colors.grey,
       type: BottomNavigationBarType.fixed,
       elevation: 8,
     ),
-    floatingActionButtonTheme: const FloatingActionButtonThemeData(
-      backgroundColor: primaryColor,
+    floatingActionButtonTheme: FloatingActionButtonThemeData(
+      backgroundColor: cosmicPink,
       foregroundColor: Colors.white,
     ),
     buttonTheme: ButtonThemeData(
-      buttonColor: primaryColor,
+      buttonColor: cosmicPink,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(16),
       ),
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
-        backgroundColor: primaryColor,
+        backgroundColor: cosmicPink,
         foregroundColor: Colors.white,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(16),
         ),
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+        elevation: 8,
+        shadowColor: cosmicPink.withOpacity(0.5),
       ),
     ),
     textButtonTheme: TextButtonThemeData(
       style: TextButton.styleFrom(
-        foregroundColor: primaryColor,
+        foregroundColor: starGlow,
       ),
     ),
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
-      fillColor: const Color(0xFF2C2C2C),
+      fillColor: voidBlack.withOpacity(0.6),
       contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
       border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(8),
-        borderSide: const BorderSide(color: Colors.grey),
+        borderRadius: BorderRadius.circular(16),
+        borderSide: BorderSide(color: Colors.white.withOpacity(0.3)),
       ),
       enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(8),
-        borderSide: const BorderSide(color: Colors.grey),
+        borderRadius: BorderRadius.circular(16),
+        borderSide: BorderSide(color: Colors.white.withOpacity(0.3)),
       ),
       focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(8),
-        borderSide: const BorderSide(color: primaryColor, width: 2),
+        borderRadius: BorderRadius.circular(16),
+        borderSide: BorderSide(color: cosmicPink, width: 2),
       ),
       errorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(16),
         borderSide: const BorderSide(color: errorColor, width: 2),
       ),
+      hintStyle: TextStyle(color: Colors.white.withOpacity(0.5)),
+      labelStyle: TextStyle(color: Colors.white.withOpacity(0.7)),
+    ),
+    textTheme: TextTheme(
+      displayLarge: cosmicHeadingStyle.copyWith(fontSize: 28),
+      displayMedium: cosmicHeadingStyle,
+      displaySmall: cosmicHeadingStyle.copyWith(fontSize: 20),
+      headlineMedium: cosmicSubheadingStyle,
+      bodyLarge: cosmicBodyStyle,
+      bodyMedium: cosmicBodyStyle,
     ),
     fontFamily: 'Montserrat',
+    cardTheme: CardTheme(
+      color: voidBlack.withOpacity(0.6),
+      elevation: 8,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(
+          color: Colors.white.withOpacity(0.1),
+          width: 1,
+        ),
+      ),
+      shadowColor: cosmicPurple.withOpacity(0.3),
+    ),
+    dividerTheme: DividerThemeData(
+      color: Colors.white.withOpacity(0.1),
+      thickness: 1,
+    ),
+    snackBarTheme: SnackBarThemeData(
+      backgroundColor: voidBlack.withOpacity(0.9),
+      contentTextStyle: const TextStyle(
+        color: Colors.white,
+      ),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      behavior: SnackBarBehavior.floating,
+    ),
+    dialogTheme: DialogTheme(
+      backgroundColor: deepSpace,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(
+          color: Colors.white.withOpacity(0.1),
+          width: 1,
+        ),
+      ),
+      titleTextStyle: cosmicSubheadingStyle,
+      contentTextStyle: cosmicBodyStyle,
+    ),
   );
 }

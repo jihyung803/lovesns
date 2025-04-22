@@ -50,7 +50,7 @@ class ProfileHeader extends StatelessWidget {
 
     return Container(
       padding: const EdgeInsets.all(16.0),
-      color: Colors.white,
+      color: const Color.fromARGB(255, 25, 17, 45),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -63,7 +63,7 @@ class ProfileHeader extends StatelessWidget {
                 height: 80,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: Colors.grey.shade200,
+                  color: const Color.fromARGB(255, 238, 238, 255),
                   image: profileImageUrl != null
                       ? DecorationImage(
                           image: NetworkImage(profileImageUrl!),

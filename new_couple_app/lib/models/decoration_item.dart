@@ -6,10 +6,10 @@ enum DecorationCategory {
   pet,
   accessory,
   light,
-  seasonal
-}
+  seasonal,
+  decor,
+  plants, lighting;
 
-extension DecorationCategoryExtension on DecorationCategory {
   String get name {
     switch (this) {
       case DecorationCategory.furniture:
@@ -28,6 +28,12 @@ extension DecorationCategoryExtension on DecorationCategory {
         return 'Lights';
       case DecorationCategory.seasonal:
         return 'Seasonal';
+      case DecorationCategory.decor:
+        return 'Decor';
+      case DecorationCategory.plants:
+        return 'Plants';
+      case DecorationCategory.lighting:
+        return 'Lighting';
     }
   }
 }

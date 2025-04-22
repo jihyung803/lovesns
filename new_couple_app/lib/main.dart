@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
 import 'package:new_couple_app/config/app_theme.dart';
@@ -9,13 +10,31 @@ import 'package:new_couple_app/services/story_service.dart';
 import 'package:new_couple_app/services/calendar_service.dart';
 import 'package:new_couple_app/services/decoration_service.dart';
 import 'package:new_couple_app/screens/auth/login_screen.dart';
-import 'package:new_couple_app/screens/feed/feed_screen.dart';
-import 'package:new_couple_app/screens/main_screen.dart';
-import 'package:new_couple_app/screens/auth/couple_connect_screen.dart';
+import 'package:new_couple_app/screens/auth/magical_login_screen.dart';
+import 'package:new_couple_app/screens/auth/magical_couple_connect_screen.dart';
+import 'package:new_couple_app/screens/mystical_main_screen.dart';
+import 'package:new_couple_app/services/notification_service.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-    // Firebase 초기화
+  
+  // Set preferred orientations
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
+  
+  // Load environment variables
+  try {
+    await dotenv.load();
+    print("Environment variables loaded successfully!");
+  } catch (e) {
+    print("Failed to load environment variables: $e");
+    // App continues but OpenAI functionality won't be available
+  }
+
+  // Initialize Firebase
   await Firebase.initializeApp(
     options: FirebaseOptions(
       apiKey: 'AIzaSyBjRHZFLtDOyK2Y_xdEYBXGxznef8w0h8w',
@@ -37,6 +56,7 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => AuthService()),
+        ChangeNotifierProvider(create: (_) => NotificationService()),
         ChangeNotifierProvider(
           create: (context) => PostService(
             authService: Provider.of<AuthService>(context, listen: false)
@@ -44,7 +64,7 @@ class MyApp extends StatelessWidget {
         ),
         ChangeNotifierProvider(
           create: (context) => StoryService(
-            authService: Provider.of<AuthService>(context, listen: false)
+            Provider.of<AuthService>(context, listen: false)
           )
         ),
         ChangeNotifierProvider(
@@ -59,21 +79,20 @@ class MyApp extends StatelessWidget {
         ),
       ],
       child: MaterialApp(
-        title: 'Couple SNS',
+        title: 'Cosmic Couples',
         theme: AppTheme.lightTheme,
         darkTheme: AppTheme.darkTheme,
-        themeMode: ThemeMode.light,
+        themeMode: ThemeMode.dark, // Set default theme mode to dark for cosmic feel
         debugShowCheckedModeBanner: false,
-        initialRoute: AppRoutes.login,
         routes: AppRoutes.routes,
         home: Consumer<AuthService>(
           builder: (context, authService, _) {
             if (!authService.isLoggedIn) {
-              return const LoginScreen();
+              return const MagicalLoginScreen();
             } else if (!authService.isPartnerConnected) {
-              return const CoupleConnectScreen();
+              return const MagicalCoupleConnectScreen();
             } else {
-              return const MainScreen();
+              return const MysticalMainScreen();
             }
           },
         ),

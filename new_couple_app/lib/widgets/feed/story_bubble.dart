@@ -29,8 +29,8 @@ class StoryBubble extends StatelessWidget {
           children: [
             // Story circle
             Container(
-              width: 50,
-              height: 50,
+              width: 40,
+              height: 40,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 gradient: isCreateBubble || !isViewed
@@ -53,9 +53,9 @@ class StoryBubble extends StatelessWidget {
                 backgroundImage: imageUrl != null ? NetworkImage(imageUrl!) : null,
                 child: isCreateBubble
                     ? const Icon(
-                        Icons.add_a_photo,
+                        Icons.camera_alt,
                         color: AppTheme.primaryColor,
-                        size: 28,
+                        size: 23,
                       )
                     : null,
               ),
@@ -65,7 +65,7 @@ class StoryBubble extends StatelessWidget {
             // Label
             Text(
               isCreateBubble
-                  ? 'Add Story'
+                  ? 'Today Mission'
                   : 'Story',
               style: TextStyle(
                 fontSize: 12,
